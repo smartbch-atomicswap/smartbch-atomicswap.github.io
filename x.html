@@ -22,8 +22,7 @@
         window.addEventListener("message", async function (event) {
             console.log("parent message:", event)
             if (event.data.Pay4BestWalletReq && event.data.Pay4BestWalletReq.GetAddr) {
-                readData("privateKey")
-                event.ports[0].postMessage(await readData());
+                event.ports[0].postMessage(await readData("privateKey"));
                 return
             }
         })
