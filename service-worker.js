@@ -6,10 +6,15 @@ self.addEventListener('install', function(event){
 });
 
 // Service Worker Active
-self.addEventListener('activate', function(event){
-    console.log('activated!');
-});
+// self.addEventListener('activate', function(event){
+//     console.log('activated!');
+// });
 
+
+// 安装阶段跳过等待，直接进入 active
+self.addEventListener('install', function (event) {
+    event.waitUntil(self.skipWaiting());
+});
 
 self.addEventListener('message', function(event){
     console.log("SW Received Message: " + event.data);
