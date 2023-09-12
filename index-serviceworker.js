@@ -1,4 +1,4 @@
-console.log(1)
+console.log(2)
 
 const cache = {}
 
@@ -13,8 +13,8 @@ self.addEventListener('install', function (event) {
 });
 
 self.addEventListener('message', async function (event) {
-    const client = await self.clients.get(event.clientId)
-    console.log(client, "clientId", event.clientId, "SW Received Message: " + event.data);
+    const client = await self.clients.get(event.source.id)
+    console.log(client, "clientId", event.source.id, "SW Received Message: " + event.data);
     if (event.data.action === "write") {
         const data = event.data.data
         Object.entries(data).map(([key, value]) => cache[key] = value)
