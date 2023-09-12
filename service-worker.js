@@ -1,5 +1,13 @@
 console.log("SW Startup!");
 
+bc = new BroadcastChannel('broadCast')
+bc.onmessage = function (e) {
+    console.log('receive:', e.data);
+};
+bc.onmessageerror = function (e) {
+    console.warn('error:', e);
+};
+
 // Install Service Worker
 self.addEventListener('install', function(event){
     console.log('installed!');
@@ -18,6 +26,7 @@ self.addEventListener('install', function (event) {
 
 self.addEventListener('message', function(event){
     console.log("SW Received Message: " + event.data);
+    bc.postMessage("213123")
     event.ports[0].postMessage("SW Says 'Hello back!'");
     send_message_to_all_clients("xxxxxx")
 });
