@@ -1,0 +1,18 @@
+<!DOCTYPE html>
+<html>
+<head>
+</head>
+
+<body>
+    <script>
+        bc = new BroadcastChannel('broadCast')
+        bc.onmessage = function (e) {
+            console.log('receive:', e.data);
+        };
+        bc.onmessageerror = function (e) {
+            console.warn('error:', e);
+        };
+    </script>
+</body>
+
+</html>
