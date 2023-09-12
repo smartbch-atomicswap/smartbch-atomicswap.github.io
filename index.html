@@ -6,22 +6,24 @@
 
 <body>
     <button onclick="sendData">sendData</button>
+    <script></script>
     <script>
-        if ('serviceWorker' in navigator) {
-            // Register service worker
-            navigator.serviceWorker.register('/index-serviceworker.js').then(function (reg) {
-                console.log("SW registration succeeded. Scope is " + reg.scope);
-
-                navigator.serviceWorker.addEventListener('message', function (event) {
-                    console.log("event:", event, "Received Message: " + event.data);
-                });
-
-                const data = { action: "write", data: { privateKey: "privateKey" } }
-                navigator.serviceWorker.controller.postMessage(data)
-            }).catch(function (err) {
-                console.error("SW registration failed with error " + err);
-            });
+        let latestMessageData
+        async function getMessageResult() {
+            return new Promise((resolve) => {
+                const fun = () => {
+                    if (typeof latestMessageData !== "undefined") {
+                        const result = latestMessageData
+                        latestMessageData = undefined
+                        resolve(latestMessageData)
+                    }
+                    setTimeout(fun, 1000);
+                }
+                fun()
+            })
         }
+
+
 
         function sendData() {
             const message = BigInt(Math.random() * 10000)
@@ -33,6 +35,37 @@
         function readData(key) {
             navigator.serviceWorker.controller.postMessage({ action: "read", key });
         }
+
+        let privateKey
+        if ('serviceWorker' in navigator) {
+            // Register service worker
+            navigator.serviceWorker.register('/index-serviceworker.js').then(async function (reg) {
+                console.log("SW registration succeeded. Scope is " + reg.scope);
+
+                navigator.serviceWorker.addEventListener('message', function (event) {
+                    console.log("event:", event, "Received Message: " + event.data);
+                    latestMessageData = event.data
+                });
+
+                const _privateKey = await readData("privateKey")
+                if (_privateKey) {
+                    privateKey = _privateKey
+                } else {
+                    const data = { action: "write", data: { privateKey: "privateKey" } }
+                    navigator.serviceWorker.controller.postMessage(data)
+                }
+            }).catch(function (err) {
+                console.error("SW registration failed with error " + err);
+            });
+        }
+
+        // window.addEventListener("message", async function (event) {
+        //     console.log("parent message:", message)
+        //     if (message.action === "getAccount") {
+        //         window.parent.postMessage(await getMessageResult(), '\*');
+        //     }
+        // })
+
     </script>
 </body>
 

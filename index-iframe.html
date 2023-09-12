@@ -5,18 +5,21 @@
 </head>
 
 <body>
-    <iframe src="https://smartbch-atomicswap.github.io/index.html" onload="handleOnload"
-        onMessage="handleMessage"></iframe>
+    <iframe src="https://smartbch-atomicswap.github.io/index.html" onload="handleOnload"></iframe>
 </body>
 
 <script>
     function handleOnload() {
-
+        document.querySelector("iframe").contentWindow.postMessage({ action: "getAccount" })
     }
 
     function handleMessage(message) {
         console.log("handleMessage", message)
     }
+
+    window.addEventListener("message", function receiveMessageFromIframePage(event) {
+        console.log('iframe message', event)
+    }, false);
 </script>
 
 </html>
