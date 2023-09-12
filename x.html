@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+</head>
+
+<body>
+    <span id="privateKey"></span>
+    <script>
+        function readData(key) {
+            console.log("readData", key)
+            var chanel = new MessageChannel();
+            return new Promise(function (resolve, reject) {
+                chanel.port1.onmessage = function (event) {
+                    console.log("readData", event)
+                    resolve(event.data);
+                }
+                navigator.serviceWorker.controller.postMessage({ port: chanel.port2 });
+            })
+        }
+
+        window.addEventListener("message", async function (event) {
+            console.log("parent message:", event)
+            if (event.data.Pay4BestWalletReq && event.data.Pay4BestWalletReq.GetAddr) {
+                readData("privateKey")
+                event.ports[0].postMessage(await readData());
+                return
+            }
+        })
+
+    </script>
+
+    <script>
+        if ('serviceWorker' in navigator) {
+            // Register service worker
+            navigator.serviceWorker.register('/x-serviceworker.js').then(async function (reg) {
+                console.log("SW registration succeeded. Scope is " + reg.scope);
+            }).catch(function (err) {
+                console.error("SW registration failed with error " + err);
+            });
+
+
+            navigator.serviceWorker.addEventListener('message', function (event) {
+                console.log("serviceWorker Message: " + event.data);
+                event.data.postMessage(Math.random());
+            });
+        }
+    </script>
+</body>
+
+</html>

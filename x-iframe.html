@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+</head>
+
+<body>
+    <iframe src="https://smartbch-atomicswap.github.io/x.html" onload="handleOnload"></iframe>
+</body>
+
+<script>
+    function handleOnload() {
+        const channel = new MessageChannel();
+        document.querySelector("iframe").contentWindow.postMessage({
+            Pay4BestWalletReq: {
+                GetAddr: true,
+            }
+        }, '*', [channel.port1]);
+        channel.port2.onmessage = function (event) {
+            console.log("GetAddr onmessage", event)
+        }
+    }
+
+    function sendTx() {
+        const channel = new MessageChannel();
+        document.querySelector("iframe").contentWindow.postMessage({
+            Pay4BestWalletReq: {
+                UnsignedTx: BigInt(13123),
+            }
+        }, '*', [channel.port1]);
+        channel.port2.onmessage = function (event) {
+            console.log("UnsignedTx onmessage", event)
+        }
+    }
+
+
+</script>
+
+</html>
