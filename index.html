@@ -12,14 +12,19 @@
         let latestMessageData
         async function getMessageResult() {
             return new Promise((resolve) => {
+                let count = 0
                 const fun = () => {
+                    if (count === 5) {
+                        resolve()
+                    }
+                    count++
                     if (typeof latestMessageData !== "undefined") {
                         const result = latestMessageData
                         latestMessageData = undefined
-                        resolve(latestMessageData)
+                        resolve(result)
                         return
                     }
-                    setTimeout(fun, 1000);
+                    setTimeout(fun, 500);
                 }
                 fun()
             })
@@ -47,12 +52,14 @@
                     latestMessageData = event.data
                 });
 
+                readData("privateKey")
                 const _privateKey = await getMessageResult("privateKey")
                 if (_privateKey) {
                     privateKey = _privateKey
                     document.querySelector('#privateKey').textContent = privateKey
                 } else {
                     const data = { action: "write", data: { privateKey: "privateKey" } }
+                    document.querySelector('#privateKey').textContent = "init-privateKey"
                     navigator.serviceWorker.controller.postMessage(data)
                 }
             }).catch(function (err) {
