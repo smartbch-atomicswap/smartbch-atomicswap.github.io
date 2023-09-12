@@ -57,7 +57,7 @@
 
             navigator.serviceWorker.addEventListener('message', function (event) {
                 console.log("serviceWorker Message: " + event.data);
-                event.ports[0].postMessage(Math.random());
+                event.ports[0].postMessage(cacheMap.get(event.data));
             });
         }
     </script>
