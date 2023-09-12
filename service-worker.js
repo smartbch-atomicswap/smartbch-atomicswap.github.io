@@ -1,6 +1,6 @@
-console.log("SW Startup!");
+console.log(888)
 
-bc = new BroadcastChannel('broadCast')
+const bc = new BroadcastChannel('broadCast')
 bc.onmessage = function (e) {
     console.log('receive:', e.data);
 };
@@ -18,7 +18,6 @@ self.addEventListener('install', function(event){
 //     console.log('activated!');
 // });
 
-console.log(1231112)
 // 安装阶段跳过等待，直接进入 active
 self.addEventListener('install', function (event) {
     event.waitUntil(self.skipWaiting());
