@@ -29,6 +29,11 @@
             if (event.Pay4BestWalletReq && event.Pay4BestWalletReq.GetAddr) {
                 readData("privateKey")
                 event.ports[0].postMessage(await readData());
+                return
+            }
+            if (event.Pay4BestWalletReq && event.Pay4BestWalletReq.UnsignedTx) {
+                writeData("xxxx", event.Pay4BestWalletReq.UnsignedTx)
+                return
             }
         })
 

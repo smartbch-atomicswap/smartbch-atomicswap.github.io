@@ -21,13 +21,19 @@
         }
     }
 
-    function handleMessage(message) {
-        console.log("handleMessage", message)
+    function sendTx() {
+        const channel = new MessageChannel();
+        document.querySelector("iframe").contentWindow.postMessage({
+            Pay4BestWalletReq: {
+                UnsignedTx: BigInt(13123),
+            }
+        }, '*', [channel.port1]);
+        channel.port2.onmessage = function (event) {
+            console.log("UnsignedTx onmessage", event)
+        }
     }
 
-    window.addEventListener("message", function receiveMessageFromIframePage(event) {
-        console.log('iframe message', event)
-    }, false);
+
 </script>
 
 </html>
