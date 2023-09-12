@@ -1,4 +1,4 @@
-console.log(1)
+console.log(2)
 
 // Install Service Worker
 self.addEventListener('install', function (event) {
