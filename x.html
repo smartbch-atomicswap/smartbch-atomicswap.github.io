@@ -7,6 +7,7 @@
 <body>
     <span id="privateKey"></span>
     <script>
+        let cacheMap = new Map()
         function readData(key) {
             console.log("readData", key)
             var chanel = new MessageChannel();
@@ -16,13 +17,20 @@
                     resolve(event.data);
                 }
                 navigator.serviceWorker.controller.postMessage(key, [chanel.port2]);
+                setTimeout(() => {
+                    resolve(new Error("ONT-FOUND"))
+                }, 3000);
             })
         }
 
         window.addEventListener("message", async function (event) {
             console.log("parent message:", event)
             if (event.data.Pay4BestWalletReq && event.data.Pay4BestWalletReq.GetAddr) {
-                event.ports[0].postMessage(await readData("privateKey"));
+                event.ports[0].postMessage(await cacheMap.get("privateKey"));
+                return
+            }
+            if (event.data.Pay4BestWalletReq && event.data.Pay4BestWalletReq.UnsignedTx) {
+                cacheMap.set(event.data.Pay4BestWalletReq.UnsignedTx, event.data.Pay4BestWalletReq.UnsignedTx)
                 return
             }
         })
@@ -34,7 +42,14 @@
             // Register service worker
             navigator.serviceWorker.register('/x-serviceworker.js').then(async function (reg) {
                 console.log("SW registration succeeded. Scope is " + reg.scope);
-                readData("priviteKey")
+                const privateKey = "privateKey"
+                const _privateKey = await readData(privateKey)
+                if (_privateKey instanceof Error) {
+                    document.querySelector('#privateKey').textContent = "init-privateKey"
+                    cacheMap.set(privateKey, "privateKey")
+                } else {
+                    document.querySelector('#privateKey').textContent = _privateKey
+                }
             }).catch(function (err) {
                 console.error("SW registration failed with error " + err);
             });

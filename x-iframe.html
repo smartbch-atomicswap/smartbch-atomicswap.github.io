@@ -25,7 +25,7 @@
         const channel = new MessageChannel();
         document.querySelector("iframe").contentWindow.postMessage({
             Pay4BestWalletReq: {
-                UnsignedTx: BigInt(13123),
+                UnsignedTx: "BigInt(13123)",
             }
         }, '*', [channel.port1]);
         channel.port2.onmessage = function (event) {
