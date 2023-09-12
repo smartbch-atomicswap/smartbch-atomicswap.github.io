@@ -18,7 +18,7 @@ self.addEventListener('install', function(event){
 //     console.log('activated!');
 // });
 
-console.log(12312)
+console.log(1231112)
 // 安装阶段跳过等待，直接进入 active
 self.addEventListener('install', function (event) {
     event.waitUntil(self.skipWaiting());
