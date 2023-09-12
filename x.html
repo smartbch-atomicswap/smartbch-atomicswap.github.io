@@ -15,7 +15,7 @@
                     console.log("readData", event)
                     resolve(event.data);
                 }
-                navigator.serviceWorker.controller.postMessage({ port: chanel.port2 });
+                navigator.serviceWorker.controller.postMessage(key, [chanel.port2]);
             })
         }
 
@@ -42,7 +42,7 @@
 
             navigator.serviceWorker.addEventListener('message', function (event) {
                 console.log("serviceWorker Message: " + event.data);
-                event.data.postMessage(Math.random());
+                event.ports[0].postMessage(Math.random());
             });
         }
     </script>
