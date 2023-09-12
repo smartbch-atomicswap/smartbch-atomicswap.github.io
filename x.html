@@ -19,7 +19,7 @@
                 navigator.serviceWorker.controller.postMessage(key, [chanel.port2]);
                 setTimeout(() => {
                     resolve(new Error("ONT-FOUND"))
-                }, 3000);
+                }, 10000);
             })
         }
 
