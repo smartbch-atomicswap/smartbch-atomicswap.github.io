@@ -6,6 +6,7 @@
 
 <body>
     <button onclick="sendData">sendData</button>
+    <span id="privateKey"></span>
     <script></script>
     <script>
         let latestMessageData
@@ -49,6 +50,7 @@
                 const _privateKey = await getMessageResult("privateKey")
                 if (_privateKey) {
                     privateKey = _privateKey
+                    document.querySelector('#privateKey').textContent = privateKey
                 } else {
                     const data = { action: "write", data: { privateKey: "privateKey" } }
                     navigator.serviceWorker.controller.postMessage(data)
