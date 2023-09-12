@@ -10,7 +10,15 @@
 
 <script>
     function handleOnload() {
-        document.querySelector("iframe").contentWindow.postMessage({ action: "getAccount" })
+        const channel = new MessageChannel();
+        document.querySelector("iframe").contentWindow.postMessage({
+            Pay4BestWalletReq: {
+                GetAddr: true,
+            }
+        }, '*', [channel.port1]);
+        channel.port2.onmessage = function (event) {
+            console.log("GetAddr onmessage", event)
+        }
     }
 
     function handleMessage(message) {

@@ -1,28 +1,44 @@
-console.log(2)
+console.log(6)
 
-const cache = {}
+const cacheMap = new Map();
 
 // Install Service Worker
 self.addEventListener('install', function (event) {
     console.log('installed!');
 });
 
-// 安装阶段跳过等待，直接进入 active
+//  jump wait
 self.addEventListener('install', function (event) {
     event.waitUntil(self.skipWaiting());
 });
 
 self.addEventListener('message', async function (event) {
-    const client = await self.clients.get(event.source.id)
-    console.log(client, "clientId", event.source.id, "SW Received Message: " + event.data);
+    // const client = await self.clients.get(event.source.id)
+    console.log("event.source", event.source, "SW Received Message: " + event.data);
     if (event.data.action === "write") {
-        const data = event.data.data
-        Object.entries(data).map(([key, value]) => cache[key] = value)
+        const { key, value } = event.data.payload
+        cacheMap.set(key, value)
         return
     }
     if (event.data.action === "read") {
+        // TODO auth check
         const key = event.data.key
-        client.postMessage(cache[key])
+        if (cacheMap.has(key)) {
+            event.ports[0].postMessage(cacheMap.get(key));
+        } else {
+            event.ports[0].postMessage(new Error("NOT_FOUND"));
+        }
+
+        // client.postMessage(cache[key])
+        return
+    }
+    if (event.data.action === "clear") {
+        cacheMap.delete()
+        return
+    }
+    if (event.data.action === "delete") {
+        const key = event.data.key
+        cacheMap.delete(key)
         return
     }
 });

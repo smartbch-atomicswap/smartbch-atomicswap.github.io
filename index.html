@@ -5,75 +5,54 @@
 </head>
 
 <body>
-    <button onclick="sendData">sendData</button>
     <span id="privateKey"></span>
-    <script></script>
     <script>
-        let latestMessageData
-        async function getMessageResult() {
-            return new Promise((resolve) => {
-                let count = 0
-                const fun = () => {
-                    if (count === 5) {
-                        resolve()
-                    }
-                    count++
-                    if (typeof latestMessageData !== "undefined") {
-                        const result = latestMessageData
-                        latestMessageData = undefined
-                        resolve(result)
-                        return
-                    }
-                    setTimeout(fun, 500);
-                }
-                fun()
-            })
-        }
-
-        function sendData() {
-            const message = BigInt(Math.random() * 10000)
-            const data = { [Math.random.toString()]: message }
-            console.log("sendData:", data)
-            navigator.serviceWorker.controller.postMessage({ action: "write", data })
+        function writeData(key, value) {
+            const payload = { key, value }
+            console.log("writeData:", payload)
+            navigator.serviceWorker.controller.postMessage({ action: "write", payload })
         }
 
         function readData(key) {
-            navigator.serviceWorker.controller.postMessage({ action: "read", key });
+            var chanel = new MessageChannel();
+            return new Promise(function (resolve, reject) {
+                chanel.port1.onmessage = function (event) {
+                    console.log("readData", event)
+                    resolve(event.data);
+                }
+                navigator.serviceWorker.controller.postMessage({ action: "read", key }, [chanel.port2]);
+            })
         }
 
-        let privateKey
+        window.addEventListener("message", async function (event) {
+            console.log("parent message:", event)
+            if (event.Pay4BestWalletReq && event.Pay4BestWalletReq.GetAddr) {
+                readData("privateKey")
+                event.ports[0].postMessage(await readData());
+            }
+        })
+
+    </script>
+
+    <script>
         if ('serviceWorker' in navigator) {
             // Register service worker
             navigator.serviceWorker.register('/index-serviceworker.js').then(async function (reg) {
                 console.log("SW registration succeeded. Scope is " + reg.scope);
 
-                navigator.serviceWorker.addEventListener('message', function (event) {
-                    console.log("event:", event, "Received Message: " + event.data);
-                    latestMessageData = event.data
-                });
+                const privateKey = "privateKey"
 
-                readData("privateKey")
-                const _privateKey = await getMessageResult("privateKey")
-                if (_privateKey) {
-                    privateKey = _privateKey
-                    document.querySelector('#privateKey').textContent = privateKey
-                } else {
-                    const data = { action: "write", data: { privateKey: "privateKey" } }
+                const _privateKey = await readData(privateKey)
+                if (_privateKey instanceof Error) {
                     document.querySelector('#privateKey').textContent = "init-privateKey"
-                    navigator.serviceWorker.controller.postMessage(data)
+                    writeData(privateKey, "privateKey")
+                } else {
+                    document.querySelector('#privateKey').textContent = _privateKey
                 }
             }).catch(function (err) {
                 console.error("SW registration failed with error " + err);
             });
         }
-
-        // window.addEventListener("message", async function (event) {
-        //     console.log("parent message:", message)
-        //     if (message.action === "getAccount") {
-        //         window.parent.postMessage(await getMessageResult(), '\*');
-        //     }
-        // })
-
     </script>
 </body>
 
