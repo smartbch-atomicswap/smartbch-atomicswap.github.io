@@ -16,14 +16,13 @@
                         const result = latestMessageData
                         latestMessageData = undefined
                         resolve(latestMessageData)
+                        return
                     }
                     setTimeout(fun, 1000);
                 }
                 fun()
             })
         }
-
-
 
         function sendData() {
             const message = BigInt(Math.random() * 10000)
@@ -47,7 +46,7 @@
                     latestMessageData = event.data
                 });
 
-                const _privateKey = await readData("privateKey")
+                const _privateKey = await getMessageResult("privateKey")
                 if (_privateKey) {
                     privateKey = _privateKey
                 } else {
